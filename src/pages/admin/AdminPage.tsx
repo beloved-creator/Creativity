@@ -14,6 +14,7 @@ import { usePageMeta } from '../../hooks/usePageMeta'
 import { adminEmail, isAdmin, signInWithGoogle, signOutUser, watchAuth, type User } from '../../lib/auth'
 import { getFirebaseConfigProblem } from '../../lib/firebase'
 import {
+  DataNotReadyError,
   deleteNews,
   deletePost,
   deleteProject,
@@ -121,22 +122,31 @@ function ProfileTab() {
   const state = useAsyncData(getProfile)
   const [message, setMessage] = useState('')
 
+  // 프로필이 아직 없으면 빈 입력칸을 보여 주고, 저장하면 새로 만듭니다.
+  const missing = state.error instanceof DataNotReadyError
+
   if (state.loading) return <LoadingState />
-  if (state.error || !state.data) {
+  if (!missing && (state.error || !state.data)) {
     return <ErrorState message={state.error?.message ?? '프로필을 불러오지 못했습니다.'} onRetry={state.retry} />
   }
   return (
     <section className="rounded-2xl bg-white p-5 shadow-md ring-1 ring-slate-200 sm:p-6">
+      {missing && (
+        <p className="mb-4 rounded-xl bg-amber-50 p-3 text-sm text-amber-900 ring-1 ring-amber-200">
+          아직 프로필이 없습니다. 아래 칸을 채우고 <strong>프로필 저장</strong>을 누르면 새로 만들어집니다.
+        </p>
+      )}
       <p aria-live="polite" className="mb-4 min-h-6 text-sm font-medium text-emerald-700">
         {message}
       </p>
       <EntityForm
         fields={profileFields}
-        initialValues={toFormValues(state.data, profileFields)}
+        initialValues={toFormValues(state.data ?? {}, profileFields)}
         submitLabel="프로필 저장"
         onSubmit={async (data) => {
           await saveProfile({ ...data, id: 'main' } as Profile)
           setMessage('프로필을 저장했습니다.')
+          if (missing) state.retry() // 새로 만든 프로필을 다시 불러와 안내 문구 없애기
         }}
       />
     </section>
