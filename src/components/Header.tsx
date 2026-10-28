@@ -10,8 +10,10 @@ const navItems = [
 ]
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
-  `block rounded px-3 py-2 text-[15px] font-medium transition-colors ${
-    isActive ? 'text-brand-700 bg-brand-50' : 'text-slate-700 hover:text-brand-700 hover:bg-brand-50'
+  `block rounded-full px-4 py-2 text-[15px] font-semibold transition-all ${
+    isActive
+      ? 'bg-hero text-white shadow-md shadow-accent-600/30'
+      : 'text-slate-700 hover:bg-accent-50 hover:text-accent-700'
   }`
 
 export default function Header() {
@@ -26,10 +28,16 @@ export default function Header() {
   }, [open])
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-white/60 bg-white/70 shadow-sm shadow-slate-900/5 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4 sm:px-6">
-        <Link to="/" className="text-lg font-bold tracking-tight text-brand-800" onClick={() => setOpen(false)}>
-          {siteConfig.siteName}
+        <Link to="/" className="group flex items-center gap-2.5" onClick={() => setOpen(false)}>
+          <span
+            aria-hidden="true"
+            className="bg-hero flex h-9 w-9 items-center justify-center rounded-xl font-serif text-lg text-white shadow-md shadow-accent-600/30 transition-transform group-hover:rotate-6"
+          >
+            Ψ
+          </span>
+          <span className="text-gradient text-lg font-extrabold tracking-tight">{siteConfig.siteName}</span>
         </Link>
 
         {/* 데스크톱 메뉴 */}
@@ -48,7 +56,7 @@ export default function Header() {
         {/* 모바일 햄버거 버튼 */}
         <button
           type="button"
-          className="-mr-2 inline-flex h-11 w-11 items-center justify-center rounded text-slate-700 hover:bg-brand-50 md:hidden"
+          className="-mr-2 inline-flex h-11 w-11 items-center justify-center rounded-full text-slate-700 hover:bg-accent-50 md:hidden"
           aria-expanded={open}
           aria-controls="mobile-menu"
           aria-label={open ? '메뉴 닫기' : '메뉴 열기'}
@@ -61,7 +69,7 @@ export default function Header() {
       </div>
 
       {open && (
-        <nav id="mobile-menu" aria-label="모바일 메뉴" className="border-t border-slate-200 bg-white md:hidden">
+        <nav id="mobile-menu" aria-label="모바일 메뉴" className="border-t border-slate-200/70 bg-white/95 backdrop-blur-xl md:hidden">
           <ul className="mx-auto max-w-5xl space-y-1 px-4 py-3">
             {navItems.map((item) => (
               <li key={item.to}>

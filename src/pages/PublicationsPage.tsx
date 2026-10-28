@@ -77,7 +77,7 @@ function PublicationList({ publications, profile }: { publications: Publication[
 
   return (
     <>
-      <div role="tablist" aria-label="연구 업적 유형" className="-mx-4 flex gap-1 overflow-x-auto border-b border-slate-200 px-4 sm:mx-0 sm:px-0">
+      <div role="tablist" aria-label="연구 업적 유형" className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0">
         {publicationTabs.map((t, i) => {
           const selected = t.key === tabKey
           return (
@@ -94,11 +94,18 @@ function PublicationList({ publications, profile }: { publications: Publication[
               tabIndex={selected ? 0 : -1}
               onClick={() => update({ tab: t.key, year: '' })}
               onKeyDown={(e) => onTabKeyDown(e, i)}
-              className={`-mb-px shrink-0 whitespace-nowrap border-b-2 px-3 py-3 text-[15px] font-semibold transition-colors sm:px-4 ${
-                selected ? 'border-brand-700 text-brand-800' : 'border-transparent text-slate-600 hover:text-brand-700'
+              className={`shrink-0 whitespace-nowrap rounded-full px-4 py-2.5 text-[15px] font-bold transition-all ${
+                selected
+                  ? 'bg-hero text-white shadow-lg shadow-accent-600/30'
+                  : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:text-accent-700 hover:ring-accent-300'
               }`}
             >
-              {t.label} <span className="font-normal text-slate-500">({countFor(t.types)})</span>
+              {t.label}{' '}
+              <span
+                className={`ml-1 rounded-full px-2 py-0.5 text-xs ${selected ? 'bg-white/20 text-white' : 'bg-accent-50 text-accent-700'}`}
+              >
+                {countFor(t.types)}
+              </span>
             </button>
           )
         })}
@@ -106,7 +113,7 @@ function PublicationList({ publications, profile }: { publications: Publication[
 
       <div id="publication-panel" role="tabpanel" aria-labelledby={`tab-${tabKey}`} className="pt-6">
         {/* 검색·필터 */}
-        <div className="flex flex-col gap-3 sm:flex-row">
+        <div className="flex flex-col gap-3 rounded-2xl bg-white p-3 shadow-md shadow-slate-900/5 ring-1 ring-slate-200 sm:flex-row">
           <div className="flex-1">
             <label htmlFor="pub-search" className="sr-only">
               제목, 저자, 키워드 검색
@@ -117,7 +124,7 @@ function PublicationList({ publications, profile }: { publications: Publication[
               value={query}
               onChange={(e) => update({ q: e.target.value })}
               placeholder="제목, 저자, 키워드 검색"
-              className="w-full rounded border border-slate-300 px-3 py-2 text-base placeholder:text-slate-500 focus:border-brand-600"
+              className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-base placeholder:text-slate-500 focus:border-accent-600 focus:bg-white"
             />
           </div>
           <div>
@@ -128,7 +135,7 @@ function PublicationList({ publications, profile }: { publications: Publication[
               id="pub-year"
               value={year ?? ''}
               onChange={(e) => update({ year: e.target.value })}
-              className="w-full rounded border border-slate-300 bg-white px-3 py-2 text-base sm:w-40"
+              className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-base sm:w-40"
             >
               <option value="">전체 연도</option>
               {years.map((y) => (
@@ -141,12 +148,12 @@ function PublicationList({ publications, profile }: { publications: Publication[
         </div>
 
         <p aria-live="polite" className="mt-4 text-sm text-slate-600">
-          {filtered.length}건
+          <strong className="text-accent-700">{filtered.length}</strong>건
           {(query || year) && (
             <button
               type="button"
               onClick={() => update({ q: '', year: '' })}
-              className="ml-3 font-medium text-brand-700 underline underline-offset-2 hover:text-brand-900"
+              className="ml-3 font-semibold text-accent-700 underline underline-offset-2 hover:text-accent-600"
             >
               필터 초기화
             </button>
@@ -154,17 +161,21 @@ function PublicationList({ publications, profile }: { publications: Publication[
         </p>
 
         {groups.length === 0 ? (
-          <p className="py-10 text-center text-slate-600">조건에 맞는 항목이 없습니다.</p>
+          <p className="mt-6 rounded-2xl bg-white py-12 text-center text-slate-600 ring-1 ring-slate-200">조건에 맞는 항목이 없습니다. 🔍</p>
         ) : (
           <div className="mt-6 space-y-10">
             {groups.map(([y, items]) => (
               <section key={y} aria-labelledby={`year-${y}`}>
-                <h2 id={`year-${y}`} className="mb-4 border-b border-slate-200 pb-2 text-xl font-bold text-brand-900">
-                  {y}
+                <h2 id={`year-${y}`} className="mb-4 flex items-center gap-3 text-2xl font-extrabold">
+                  <span className="text-gradient">{y}</span>
+                  <span aria-hidden="true" className="h-px flex-1 bg-gradient-to-r from-accent-200 to-transparent" />
                 </h2>
-                <ul className="space-y-7">
+                <ul className="space-y-4">
                   {items.map((p) => (
-                    <li key={p.id}>
+                    <li
+                      key={p.id}
+                      className="rounded-2xl bg-white p-5 shadow-md shadow-slate-900/5 ring-1 ring-slate-200 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-accent-600/10 hover:ring-accent-200"
+                    >
                       <PublicationItem publication={p} highlightNames={profile.authorNames} />
                     </li>
                   ))}

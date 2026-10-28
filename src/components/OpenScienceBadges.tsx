@@ -15,7 +15,7 @@ export default function OpenScienceBadges({ publication }: { publication: Public
         <li
           key={b.key}
           title={b.title}
-          className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-900"
+          className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-emerald-50 to-teal-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-800 ring-1 ring-emerald-300"
         >
           <svg aria-hidden="true" viewBox="0 0 16 16" className="h-3 w-3" fill="currentColor">
             <path d="M6.2 11.3 3 8.1l1.1-1.1 2.1 2.1 5.7-5.7L13 4.5z" />

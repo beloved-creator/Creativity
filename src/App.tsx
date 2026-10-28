@@ -1,10 +1,15 @@
+import { lazy, Suspense } from 'react'
 import { Route, Routes } from 'react-router'
 import Layout from './components/Layout'
+import LoadingState from './components/LoadingState'
 import ContactPage from './pages/ContactPage'
 import HomePage from './pages/HomePage'
 import NotFoundPage from './pages/NotFoundPage'
 import ProjectsPage from './pages/ProjectsPage'
 import PublicationsPage from './pages/PublicationsPage'
+
+// 관리자 페이지는 /admin 접속 시에만 내려받습니다.
+const AdminPage = lazy(() => import('./pages/admin/AdminPage'))
 
 export default function App() {
   return (
@@ -14,7 +19,14 @@ export default function App() {
         <Route path="publications" element={<PublicationsPage />} />
         <Route path="projects" element={<ProjectsPage />} />
         <Route path="contact" element={<ContactPage />} />
-        {/* 다음 단계: <Route path="admin" element={<AdminPage />} /> */}
+        <Route
+          path="admin"
+          element={
+            <Suspense fallback={<LoadingState />}>
+              <AdminPage />
+            </Suspense>
+          }
+        />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

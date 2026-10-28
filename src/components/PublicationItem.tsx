@@ -13,11 +13,10 @@ interface Props {
 }
 
 const linkClass =
-  'inline-flex items-center rounded border border-brand-200 bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-800 hover:border-brand-600 hover:bg-brand-100'
+  'inline-flex items-center rounded-full border border-accent-200 bg-accent-50 px-3 py-1 text-xs font-bold text-accent-700 transition-colors hover:border-accent-600 hover:bg-accent-600 hover:text-white'
 
 export default function PublicationItem({ publication: p, highlightNames, showAbstract = true }: Props) {
   const segments = formatApa(p, highlightNames)
-  // 본문의 DOI 주소는 인용문 안에 이미 링크로 표시되므로, 버튼 영역에는 짧은 "DOI" 링크를 둡니다.
   return (
     <article className="space-y-3">
       <p className="pl-8 -indent-8 leading-relaxed text-slate-800">
@@ -44,7 +43,7 @@ export default function PublicationItem({ publication: p, highlightNames, showAb
       </div>
       {showAbstract && p.abstract && (
         <details className="text-sm text-slate-700">
-          <summary className="cursor-pointer select-none font-medium text-slate-600 hover:text-brand-700">초록 보기</summary>
+          <summary className="cursor-pointer select-none font-medium text-slate-600 hover:text-accent-700">초록 보기</summary>
           <p className="mt-2 leading-relaxed">{p.abstract}</p>
         </details>
       )}

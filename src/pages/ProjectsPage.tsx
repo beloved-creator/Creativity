@@ -20,32 +20,39 @@ function ProjectCard({ project, pubsById }: { project: Project; pubsById: Map<st
   const ongoing = project.status === 'ongoing'
 
   return (
-    <article className="flex flex-col rounded-lg border border-slate-200 p-6 shadow-sm">
+    <article className="group relative flex animate-fade-up flex-col overflow-hidden rounded-2xl bg-white p-6 pt-7 shadow-lg shadow-slate-900/5 ring-1 ring-slate-200 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-accent-600/15 hover:ring-accent-200">
+      <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-sky-400 via-accent-500 to-pink-500" />
       <div className="flex flex-wrap items-center gap-2">
         <span
-          className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-            ongoing ? 'bg-brand-700 text-white' : 'bg-slate-100 text-slate-700 ring-1 ring-slate-300'
+          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${
+            ongoing ? 'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-300' : 'bg-slate-100 text-slate-700 ring-1 ring-slate-300'
           }`}
         >
+          {ongoing && (
+            <span aria-hidden="true" className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+            </span>
+          )}
           {projectStatusLabel[project.status]}
         </span>
         <span className="text-sm tabular-nums text-slate-600">{formatPeriod(project.startDate, project.endDate)}</span>
       </div>
-      <h2 className="mt-3 text-lg font-bold leading-snug text-brand-900">{project.title}</h2>
-      <p className="mt-1 text-sm text-slate-600">
+      <h2 className="mt-4 text-xl font-extrabold leading-snug text-slate-900 transition-colors group-hover:text-accent-700">{project.title}</h2>
+      <p className="mt-2 inline-flex w-fit rounded-lg bg-accent-50 px-2.5 py-1 text-sm font-medium text-accent-700">
         <span className="sr-only">지원기관: </span>
         {project.funder}
       </p>
       <p className="mt-4 leading-relaxed text-slate-700">{project.summary}</p>
       {related.length > 0 && (
-        <div className="mt-5 border-t border-slate-200 pt-4">
+        <div className="mt-5 rounded-xl bg-slate-50 p-4">
           <h3 className="text-sm font-semibold text-slate-500">관련 연구 업적</h3>
           <ul className="mt-2 space-y-2 text-sm">
             {related.map((p) => (
               <li key={p.id}>
                 <Link
                   to={`/publications?tab=${tabKeyOf(p)}&q=${encodeURIComponent(p.title)}`}
-                  className="text-brand-700 underline underline-offset-2 hover:text-brand-900"
+                  className="font-medium text-brand-800 underline decoration-accent-200 underline-offset-2 hover:text-accent-700 hover:decoration-accent-600"
                 >
                   {p.title}
                 </Link>
