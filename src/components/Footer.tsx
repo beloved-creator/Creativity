@@ -19,6 +19,7 @@ export default function Footer() {
             <li><Link to="/publications" className="text-white/90 hover:text-white hover:underline">연구 업적</Link></li>
             <li><Link to="/projects" className="text-white/90 hover:text-white hover:underline">연구 프로젝트</Link></li>
             <li><Link to="/contact" className="text-white/90 hover:text-white hover:underline">연락처</Link></li>
+            <li><Link to="/admin" className="text-white/80 hover:text-white hover:underline">관리</Link></li>
           </ul>
         </nav>
       </div>
