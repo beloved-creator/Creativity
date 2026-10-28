@@ -22,7 +22,7 @@ export default function CopyCitationButton({ segments }: { segments: ApaSegment[
     <button
       type="button"
       onClick={handleClick}
-      className="inline-flex items-center gap-1.5 rounded border border-slate-300 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:border-brand-600 hover:text-brand-700"
+      className="inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-semibold text-slate-700 transition-colors hover:border-accent-600 hover:text-accent-700"
     >
       <svg aria-hidden="true" viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.5">
         <rect x="5" y="5" width="8.5" height="8.5" rx="1.5" />

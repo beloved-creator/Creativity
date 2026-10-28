@@ -4,7 +4,8 @@
 
 ## 기술 스택
 - Vite 8 + React 19 + TypeScript (`tsc -b` 로 타입 검사)
-- Tailwind CSS v4 (`@tailwindcss/vite`, 토큰은 `src/index.css` 의 `@theme`: `brand-*` 남색 계열)
+- Tailwind CSS v4 (`@tailwindcss/vite`, 토큰은 `src/index.css` 의 `@theme`: `brand-*` 남색, `accent-*` 보라 계열)
+- 디자인 톤: 화려한 남색→보라 그라데이션. 공용 유틸 `bg-hero`(그라데이션 배경), `text-gradient`, `bg-dots`, 애니메이션 `animate-fade-up`·`animate-float` (`prefers-reduced-motion` 시 꺼짐). 흰 글자는 `bg-hero` 위에만 사용해 명암비 유지
 - React Router v8 (`react-router` 패키지, `BrowserRouter` + `Routes`)
 - Lint: oxlint (`npm run lint`, 설정 `.oxlintrc.json`) — 경고 0개 유지
 - Node 24 LTS (`.nvmrc`, `netlify.toml`), npm

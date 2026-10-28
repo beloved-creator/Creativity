@@ -11,7 +11,7 @@ export default function ApaCitation({ segments }: { segments: ApaSegment[] }) {
         if (s.bold) node = <strong className="font-semibold text-slate-900">{node}</strong>
         if (s.href)
           node = (
-            <a href={s.href} target="_blank" rel="noopener noreferrer" className="break-all text-brand-700 underline underline-offset-2 hover:text-brand-900">
+            <a href={s.href} target="_blank" rel="noopener noreferrer" className="break-all text-accent-700 underline decoration-accent-200 underline-offset-2 hover:decoration-accent-600">
               {node}
             </a>
           )

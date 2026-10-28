@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 
-/* 디자인 토큰: 포인트 색(짙은 남색)과 Pretendard 폰트 */
+/* 디자인 토큰: 남색(brand) + 보라(accent) 그라데이션, Pretendard 폰트 */
 @theme {
   --font-sans:
     'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, 'Apple SD Gothic Neo',
@@ -13,6 +13,36 @@
   --color-brand-700: #213a63;
   --color-brand-800: #1a2e50;
   --color-brand-900: #12213b;
+
+  --color-accent-50: #f5f3ff;
+  --color-accent-100: #ede9fe;
+  --color-accent-200: #ddd6fe;
+  --color-accent-500: #8b5cf6;
+  --color-accent-600: #7c3aed;
+  --color-accent-700: #6d28d9;
+
+  --animate-fade-up: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-float: float 9s ease-in-out infinite;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes float {
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+    50% {
+      transform: translate(24px, -18px) scale(1.06);
+    }
+  }
 }
 
 @layer base {
@@ -20,12 +50,42 @@
     -webkit-text-size-adjust: 100%;
   }
   body {
-    @apply bg-white font-sans text-slate-800 antialiased;
+    @apply bg-slate-50 font-sans text-slate-800 antialiased;
     word-break: keep-all;
     overflow-wrap: anywhere;
   }
   /* 키보드 이동 시 초점 표시 */
   :focus-visible {
-    @apply outline-2 outline-offset-2 outline-brand-600;
+    @apply outline-2 outline-offset-2 outline-accent-600;
+  }
+}
+
+/* 남색 → 인디고 → 보라 그라데이션 (배경용) */
+@utility bg-hero {
+  background-image: linear-gradient(135deg, #12213b 0%, #2a2f86 45%, #6d28d9 100%);
+}
+
+/* 그라데이션 글자 */
+@utility text-gradient {
+  background-image: linear-gradient(90deg, #213a63 0%, #4f46e5 50%, #7c3aed 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* 은은한 점 패턴 */
+@utility bg-dots {
+  background-image: radial-gradient(rgb(255 255 255 / 0.14) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+/* 움직임 줄이기 설정을 켠 사용자에게는 애니메이션을 끕니다 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
