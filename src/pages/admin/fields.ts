@@ -115,6 +115,13 @@ export const newsFields: FieldDef[] = [
   { name: 'url', label: '관련 링크', kind: 'text' },
 ]
 
+export const postFields: FieldDef[] = [
+  { name: 'title', label: '제목', kind: 'text', required: true },
+  { name: 'date', label: '날짜', kind: 'date', required: true },
+  { name: 'body', label: '본문', kind: 'textarea', required: true, help: '줄바꿈은 그대로 표시됩니다.' },
+  { name: 'pinned', label: '목록 맨 위에 고정 (공지)', kind: 'checkbox' },
+]
+
 export const profileFields: FieldDef[] = [
   { name: 'nameKo', label: '이름 (한글)', kind: 'text', required: true },
   { name: 'nameEn', label: '이름 (영문)', kind: 'text', required: true },

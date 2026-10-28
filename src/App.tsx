@@ -2,9 +2,11 @@ import { lazy, Suspense } from 'react'
 import { Route, Routes } from 'react-router'
 import Layout from './components/Layout'
 import LoadingState from './components/LoadingState'
+import BoardPage from './pages/BoardPage'
 import ContactPage from './pages/ContactPage'
 import HomePage from './pages/HomePage'
 import NotFoundPage from './pages/NotFoundPage'
+import PostPage from './pages/PostPage'
 import ProjectsPage from './pages/ProjectsPage'
 import PublicationsPage from './pages/PublicationsPage'
 
@@ -18,6 +20,8 @@ export default function App() {
         <Route index element={<HomePage />} />
         <Route path="publications" element={<PublicationsPage />} />
         <Route path="projects" element={<ProjectsPage />} />
+        <Route path="board" element={<BoardPage />} />
+        <Route path="board/:postId" element={<PostPage />} />
         <Route path="contact" element={<ContactPage />} />
         <Route
           path="admin"

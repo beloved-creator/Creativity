@@ -3,7 +3,7 @@
  *
  * 데이터 출처
  *  - Firebase 설정(환경 변수)이 있으면: Cloud Firestore
- *      profile/main, publications/{id}, projects/{id}, news/{id}
+ *      profile/main, publications/{id}, projects/{id}, news/{id}, posts/{id}
  *  - 설정이 없으면: src/data/ 의 TypeScript 파일 (로컬 미리보기·백업용)
  *
  * Firestore 무료 한도(하루 읽기 5만 회)를 아끼기 위해 결과를 메모리에 캐시합니다.
@@ -12,13 +12,14 @@
  */
 import { collection, deleteDoc, doc, getDoc, getDocs, setDoc, writeBatch } from 'firebase/firestore/lite'
 import { news as localNews } from '../data/news'
+import { posts as localPosts } from '../data/posts'
 import { profile as localProfile } from '../data/profile'
 import { projects as localProjects } from '../data/projects'
 import { publications as localPublications } from '../data/publications'
 import { getDb, isFirebaseConfigured } from '../lib/firebase'
-import type { NewsItem, Profile, Project, Publication } from '../types'
+import type { NewsItem, Post, Profile, Project, Publication } from '../types'
 
-type CollectionName = 'publications' | 'projects' | 'news'
+type CollectionName = 'publications' | 'projects' | 'news' | 'posts'
 const PROFILE_PATH = ['profile', 'main'] as const
 
 /** true 이면 Firestore, false 이면 src/data 를 사용 중 */
@@ -126,6 +127,19 @@ export async function getNews(limit?: number): Promise<NewsItem[]> {
   return limit === undefined ? all : all.slice(0, limit)
 }
 
+/** 공지 게시판 글: 고정 글 먼저, 그다음 최신순 */
+export function getPosts(): Promise<Post[]> {
+  return cached('posts', async () => {
+    const items = isUsingFirestore ? await readCollection<Post>('posts') : localPosts
+    return [...items].sort((a, b) => Number(!!b.pinned) - Number(!!a.pinned) || b.date.localeCompare(a.date))
+  })
+}
+
+/** 글 하나 (목록을 한 번 읽어 둔 것에서 찾으므로 추가 조회 없음). 없으면 undefined */
+export async function getPost(id: string): Promise<Post | undefined> {
+  return (await getPosts()).find((p) => p.id === id)
+}
+
 // ───────────── 쓰기 (관리자 페이지용) ─────────────
 // 실제 쓰기 권한은 Firestore 보안 규칙(firestore.rules)이 관리자 계정에만 허용합니다.
 
@@ -145,8 +159,11 @@ export const deleteProject = (id: string) => deleteFromCollection('projects', id
 export const saveNews = (item: NewsItem) => saveToCollection('news', item)
 export const deleteNews = (id: string) => deleteFromCollection('news', id)
 
+export const savePost = (item: Post) => saveToCollection('posts', item)
+export const deletePost = (id: string) => deleteFromCollection('posts', id)
+
 /**
- * src/data/ 의 내용을 Firestore로 한 번에 옮깁니다 (처음 1회용).
+ * src/data/ 의 내용을 Firestore로 한 번에 옮깁니다 (처음 1회용, 게시판 샘플 글 포함).
  * 같은 id 의 문서는 덮어쓰고, Firestore에만 있는 문서는 그대로 둡니다.
  * @returns 저장한 문서 수
  */
@@ -159,6 +176,7 @@ export async function importLocalData(): Promise<number> {
     ['publications', localPublications],
     ['projects', localProjects],
     ['news', localNews],
+    ['posts', localPosts],
   ]
   let count = 1
   for (const [name, items] of groups) {

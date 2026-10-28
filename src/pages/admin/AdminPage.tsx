@@ -15,24 +15,27 @@ import { adminEmail, isAdmin, signInWithGoogle, signOutUser, watchAuth, type Use
 import { getFirebaseConfigProblem } from '../../lib/firebase'
 import {
   deleteNews,
+  deletePost,
   deleteProject,
   deletePublication,
   getNews,
+  getPosts,
   getProfile,
   getProjects,
   getPublications,
   importLocalData,
   isUsingFirestore,
   saveNews,
+  savePost,
   saveProfile,
   saveProject,
   savePublication,
 } from '../../services/dataService'
-import type { NewsItem, Profile, Project, Publication } from '../../types'
+import type { NewsItem, Post, Profile, Project, Publication } from '../../types'
 import { formatDate, formatPeriod, projectStatusLabel } from '../../utils/format'
 import CollectionEditor from './CollectionEditor'
 import EntityForm from './EntityForm'
-import { newsFields, profileFields, projectFields, publicationFields, publicationTypeOptions, toFormValues } from './fields'
+import { newsFields, postFields, profileFields, projectFields, publicationFields, publicationTypeOptions, toFormValues } from './fields'
 
 const loadNews = () => getNews()
 
@@ -42,6 +45,7 @@ const tabs = [
   { key: 'publications', label: '연구 업적' },
   { key: 'projects', label: '프로젝트' },
   { key: 'news', label: '소식' },
+  { key: 'posts', label: '게시판' },
   { key: 'profile', label: '프로필' },
   { key: 'import', label: '데이터 가져오기' },
 ] as const
@@ -99,6 +103,20 @@ function NewsTab() {
   )
 }
 
+function PostsTab() {
+  return (
+    <CollectionEditor<Post>
+      label="게시글"
+      fields={postFields}
+      load={getPosts}
+      save={savePost}
+      remove={deletePost}
+      createEmpty={() => ({ date: new Date().toISOString().slice(0, 10) })}
+      summarize={(p) => ({ title: p.title, meta: `${p.pinned ? '공지 · ' : ''}${formatDate(p.date)}` })}
+    />
+  )
+}
+
 function ProfileTab() {
   const state = useAsyncData(getProfile)
   const [message, setMessage] = useState('')
@@ -132,7 +150,7 @@ function ImportTab() {
   const run = async () => {
     if (
       !window.confirm(
-        'src/data/ 폴더의 내용(프로필·연구 업적·프로젝트·소식)을 Firestore에 저장합니다.\n같은 id 의 항목은 덮어씁니다. 계속할까요?',
+        'src/data/ 폴더의 내용(프로필·연구 업적·프로젝트·소식·게시판)을 Firestore에 저장합니다.\n같은 id 의 항목은 덮어씁니다. 계속할까요?',
       )
     )
       return
@@ -204,6 +222,7 @@ function Dashboard({ user }: { user: User }) {
       {tab === 'publications' && <PublicationsTab />}
       {tab === 'projects' && <ProjectsTab />}
       {tab === 'news' && <NewsTab />}
+      {tab === 'posts' && <PostsTab />}
       {tab === 'profile' && <ProfileTab />}
       {tab === 'import' && <ImportTab />}
     </>
