@@ -16,11 +16,11 @@
 ## 폴더 구조
 ```
 src/types/        타입 정의. 모든 엔티티에 문자열 id (Firestore 문서 ID 예정)
-src/data/         초기 데이터·백업 (Firestore 가져오기 원본, Firebase 미설정 시 사용)
+src/data/         초기 데이터·백업 (profile, publications, projects, news, posts — Firestore 가져오기 원본, Firebase 미설정 시 사용)
 src/services/     dataService.ts — 유일한 데이터 접근 계층 (읽기 + 관리자 쓰기)
 src/hooks/        useAsyncData(로딩/오류/재시도), usePageMeta(title/description)
 src/components/   공통 UI (Layout, Header, AsyncBoundary, PublicationItem 등)
-src/pages/        라우트 페이지 (Home, Publications, Projects, Contact, NotFound)
+src/pages/        라우트 페이지 (Home, Publications, Projects, Board(/board), Post(/board/:postId), Contact, NotFound)
 src/pages/admin/  관리자 페이지 /admin (AdminPage, CollectionEditor, EntityForm, fields.ts 폼 정의)
 src/utils/        apa.ts(APA 7 서식), clipboard.ts, format.ts(라벨·날짜·탭 구성)
 src/lib/          firebase.ts(초기화·isFirebaseConfigured), auth.ts(Google 로그인·isAdmin)
@@ -30,9 +30,9 @@ firestore.rules   보안 규칙 (콘솔에 붙여 넣음. 관리자 이메일 �
 ```
 
 ## 핵심 규칙
-- **화면(pages/components)은 `src/data/` 나 Firestore를 직접 다루지 않는다. 반드시 `src/services/dataService.ts` 의 함수만 사용한다.** 읽기: `getProfile`, `getPublications`, `getFeaturedPublications`, `getProjects`, `getNews`. 쓰기(관리자): `saveProfile`, `savePublication`/`deletePublication`, `saveProject`/`deleteProject`, `saveNews`/`deleteNews`, `importLocalData`.
+- **화면(pages/components)은 `src/data/` 나 Firestore를 직접 다루지 않는다. 반드시 `src/services/dataService.ts` 의 함수만 사용한다.** 읽기: `getProfile`, `getPublications`, `getFeaturedPublications`, `getProjects`, `getNews`, `getPosts`, `getPost`. 쓰기(관리자): `saveProfile`, `savePublication`/`deletePublication`, `saveProject`/`deleteProject`, `saveNews`/`deleteNews`, `savePost`/`deletePost`, `importLocalData`.
 - dataService 함수의 이름·시그니처(`Promise<T>`)는 유지한다.
-- Firestore 구조: `profile/main` 문서 1개, `publications`·`projects`·`news` 컬렉션. 문서 ID = 엔티티 `id` (문서 본문에는 id 저장 안 함). 빈 선택 항목은 `ignoreUndefinedProperties` 로 저장 생략.
+- Firestore 구조: `profile/main` 문서 1개, `publications`·`projects`·`news`·`posts` 컬렉션. 문서 ID = 엔티티 `id` (문서 본문에는 id 저장 안 함). 빈 선택 항목은 `ignoreUndefinedProperties` 로 저장 생략.
 - 환경 변수가 없으면(`isUsingFirestore === false`) `src/data` 로 동작하고 쓰기 함수는 오류를 던진다.
 - 쓰기 후에는 해당 캐시 키를 비운다 (`cache.delete`).
 - dataService 는 결과를 메모리 캐시(`cached()`)한다 — 페이지 이동 시 반복 조회 금지. 컬렉션은 통째로 1회 읽고 클라이언트에서 필터/정렬한다.
@@ -40,7 +40,9 @@ firestore.rules   보안 규칙 (콘솔에 붙여 넣음. 관리자 이메일 �
 - APA 서식은 `src/utils/apa.ts` 의 `formatApa()` 만 사용 (segment 배열 → 화면/복사 텍스트/HTML). 저자 표기는 데이터에 APA 형식 그대로 저장, 본인 이름 굵게는 `profile.authorNames` 로 매칭. 한글 저자 목록은 `&` 없이 쉼표 나열.
 - 연구 업적 페이지 필터 상태(tab, q, year)는 URL 쿼리에 저장.
 - 접근성: 시맨틱 태그, alt/aria-label, 키보드 조작(탭 ←/→), focus-visible, 충분한 명암비. `lang="ko"`. 페이지마다 `usePageMeta`.
+- 게시판(`/board`)은 **관리자만 쓰는 공지 게시판**이다 (사용자 결정). 방문자 글쓰기·댓글은 만들지 않는다.
 - 범위 밖 기능(문의 폼, 방문자 통계, 댓글 등)은 만들지 않는다.
+- 새 컬렉션을 추가하면 `firestore.rules` 에도 match 블록을 추가하고, 사용자에게 콘솔에서 규칙을 다시 게시하라고 안내한다.
 - 완료 전 `npm run build` 와 `npm run lint` 통과 확인.
 
 ## Firebase Spark(무료) 요금제 제약 — 항상 지킬 것
@@ -60,7 +62,8 @@ firestore.rules   보안 규칙 (콘솔에 붙여 넣음. 관리자 이메일 �
 2. ✅ dataService → Firestore Lite 조회, 화면 코드 변경 없음, `importLocalData()` 1회성 가져오기
 3. ✅ Google 로그인 (`src/lib/auth.ts`, signInWithPopup)
 4. ✅ `/admin` 관리자 페이지 (VITE_ADMIN_EMAIL + email_verified 계정만 편집 화면, CRUD, 저장 후 캐시 무효화)
-5. ✅ `firestore.rules` — 4개 컬렉션 공개 읽기, 관리자만 쓰기, 그 외 전부 거부 (에뮬레이터로 10개 경우 검증)
+5. ✅ `firestore.rules` — 5개 컬렉션 공개 읽기, 관리자만 쓰기, 그 외 전부 거부 (에뮬레이터로 14개 경우 검증)
+6. ✅ 공지 게시판 `/board` (posts 컬렉션, 관리자 탭 "게시판")
 
 ## 사용자가 콘솔에서 할 일 (코드 밖)
 - 규칙 게시(이메일 교체), Netlify 환경 변수 5개 등록 후 재배포, 승인된 도메인에 Netlify 도메인, /admin 에서 "데이터 가져오기" 1회.

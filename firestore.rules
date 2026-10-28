@@ -37,5 +37,11 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
+
+    // 공지 게시판: 누구나 읽기, 관리자만 쓰기
+    match /posts/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
   }
 }

@@ -6,6 +6,7 @@ const navItems = [
   { to: '/', label: '홈', end: true },
   { to: '/publications', label: '연구 업적' },
   { to: '/projects', label: '연구 프로젝트' },
+  { to: '/board', label: '게시판' },
   { to: '/contact', label: '연락처' },
 ]
 
