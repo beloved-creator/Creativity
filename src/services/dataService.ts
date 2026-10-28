@@ -24,6 +24,14 @@ const PROFILE_PATH = ['profile', 'main'] as const
 /** true 이면 Firestore, false 이면 src/data 를 사용 중 */
 export const isUsingFirestore = isFirebaseConfigured
 
+/** Firestore에 아직 데이터를 넣지 않았을 때 (관리자 페이지에서 "데이터 가져오기" 필요) */
+export class DataNotReadyError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'DataNotReadyError'
+  }
+}
+
 // ───────────── 캐시 ─────────────
 
 const cache = new Map<string, Promise<unknown>>()
@@ -79,7 +87,7 @@ export function getProfile(): Promise<Profile> {
     if (!isUsingFirestore) return localProfile
     const snapshot = await getDoc(doc(getDb(), ...PROFILE_PATH))
     if (!snapshot.exists()) {
-      throw new Error('프로필 데이터가 아직 없습니다. 관리자 페이지에서 "기존 데이터 가져오기"를 실행해 주세요.')
+      throw new DataNotReadyError('프로필 데이터가 아직 없습니다. 관리자 페이지에서 "기존 데이터 가져오기"를 실행해 주세요.')
     }
     return { ...(snapshot.data() as Omit<Profile, 'id'>), id: snapshot.id }
   })
