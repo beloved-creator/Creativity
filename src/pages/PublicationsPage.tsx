@@ -5,11 +5,21 @@ import PageHeader from '../components/PageHeader'
 import PublicationItem from '../components/PublicationItem'
 import { useAsyncData } from '../hooks/useAsyncData'
 import { usePageMeta } from '../hooks/usePageMeta'
-import { getProfile, getPublications } from '../services/dataService'
-import type { Profile, Publication } from '../types'
+import { DataNotReadyError, getProfile, getPublications } from '../services/dataService'
+import type { Publication } from '../types'
 import { publicationTabs } from '../utils/format'
 
-const loadPage = () => Promise.all([getPublications(), getProfile()])
+/** 굵게 표시할 내 이름. 프로필이 아직 없어도 논문 목록은 보이도록 빈 목록으로 대신합니다. */
+const loadHighlightNames = () =>
+  getProfile().then(
+    (profile) => profile.authorNames,
+    (error: unknown) => {
+      if (error instanceof DataNotReadyError) return [] as string[]
+      throw error
+    },
+  )
+
+const loadPage = () => Promise.all([getPublications(), loadHighlightNames()])
 
 /** 검색어를 공백으로 나눠, 모든 단어가 제목·저자·키워드(및 학술지명·책 제목) 중 어딘가에 들어 있으면 일치 */
 function matchesQuery(p: Publication, query: string): boolean {
@@ -19,7 +29,7 @@ function matchesQuery(p: Publication, query: string): boolean {
   return words.every((w) => haystack.includes(w))
 }
 
-function PublicationList({ publications, profile }: { publications: Publication[]; profile: Profile }) {
+function PublicationList({ publications, highlightNames }: { publications: Publication[]; highlightNames: string[] }) {
   const [params, setParams] = useSearchParams()
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
 
@@ -176,7 +186,7 @@ function PublicationList({ publications, profile }: { publications: Publication[
                       key={p.id}
                       className="rounded-2xl bg-white p-5 shadow-md shadow-slate-900/5 ring-1 ring-slate-200 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-accent-600/10 hover:ring-accent-200"
                     >
-                      <PublicationItem publication={p} highlightNames={profile.authorNames} />
+                      <PublicationItem publication={p} highlightNames={highlightNames} />
                     </li>
                   ))}
                 </ul>
@@ -197,7 +207,7 @@ export default function PublicationsPage() {
     <>
       <PageHeader title="연구 업적" description="APA 7판 형식으로 표시합니다. 각 항목의 버튼으로 인용문을 복사할 수 있습니다." />
       <AsyncBoundary state={state} loadingLabel="연구 업적을 불러오는 중…">
-        {([publications, profile]) => <PublicationList publications={publications} profile={profile} />}
+        {([publications, highlightNames]) => <PublicationList publications={publications} highlightNames={highlightNames} />}
       </AsyncBoundary>
     </>
   )
