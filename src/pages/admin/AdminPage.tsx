@@ -12,6 +12,7 @@ import PageHeader from '../../components/PageHeader'
 import { useAsyncData } from '../../hooks/useAsyncData'
 import { usePageMeta } from '../../hooks/usePageMeta'
 import { adminEmail, isAdmin, signInWithGoogle, signOutUser, watchAuth, type User } from '../../lib/auth'
+import { getFirebaseConfigProblem } from '../../lib/firebase'
 import {
   deleteNews,
   deleteProject,
@@ -216,6 +217,16 @@ function AdminGate() {
 
   useEffect(() => watchAuth(setUser), [])
 
+  const configProblem = getFirebaseConfigProblem()
+  if (configProblem) {
+    return (
+      <div role="alert" className="rounded-2xl bg-red-50 p-6 text-red-900 ring-1 ring-red-200">
+        <p className="font-semibold">Firebase 설정에 문제가 있어 로그인할 수 없습니다.</p>
+        <p className="mt-2 text-sm">{configProblem}</p>
+      </div>
+    )
+  }
+
   if (user === undefined) return <LoadingState label="로그인 상태 확인 중…" />
 
   if (!user) {
@@ -232,7 +243,9 @@ function AdminGate() {
               setError(
                 code === 'auth/popup-blocked'
                   ? '팝업이 차단되었습니다. 브라우저 주소창의 팝업 차단을 해제해 주세요.'
-                  : code === 'auth/unauthorized-domain'
+                  : code.startsWith('auth/api-key-not-valid') || code === 'auth/invalid-api-key'
+                    ? 'Firebase API 키가 올바르지 않습니다. Netlify 환경 변수 VITE_FIREBASE_API_KEY 를 확인해 주세요.'
+                    : code === 'auth/unauthorized-domain'
                     ? '이 사이트 주소가 Firebase 승인된 도메인에 없습니다. Firebase 콘솔 → Authentication → 설정에서 추가해 주세요.'
                     : `로그인하지 못했습니다 (${code || String(err)})`,
               )

@@ -15,6 +15,18 @@ const env = import.meta.env
 
 export const isFirebaseConfigured = Boolean(env.VITE_FIREBASE_API_KEY && env.VITE_FIREBASE_PROJECT_ID)
 
+/**
+ * 설정값이 이상하면 이유를 돌려줍니다 (정상이면 빈 문자열).
+ * 예: 화면에 가려진 값(AIza••••)을 그대로 복사해 넣은 경우
+ */
+export function getFirebaseConfigProblem(): string {
+  const key = env.VITE_FIREBASE_API_KEY ?? ''
+  if (key && !/^[A-Za-z0-9_-]{30,}$/.test(key)) {
+    return 'Netlify 환경 변수 VITE_FIREBASE_API_KEY 값이 올바르지 않습니다. 가려진 값(•••)이 아닌 전체 키(AIza로 시작하는 39글자)를 다시 넣고 재배포해 주세요.'
+  }
+  return ''
+}
+
 /** 개발용 로컬 에뮬레이터 사용 여부 */
 export const useEmulator = env.VITE_USE_FIREBASE_EMULATOR === 'true'
 
