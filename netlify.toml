@@ -1,0 +1,14 @@
+# Netlify 배포 설정
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+# SPA(단일 페이지 앱)에서 /publications 등에서 새로고침해도 404가 나지 않도록
+# 모든 경로를 index.html 로 연결합니다. (public/ 의 실제 파일은 그대로 제공됩니다)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

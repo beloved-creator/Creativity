@@ -1,0 +1,31 @@
+@import 'tailwindcss';
+
+/* 디자인 토큰: 포인트 색(짙은 남색)과 Pretendard 폰트 */
+@theme {
+  --font-sans:
+    'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, 'Apple SD Gothic Neo',
+    'Noto Sans KR', 'Malgun Gothic', sans-serif;
+
+  --color-brand-50: #f1f4f9;
+  --color-brand-100: #e1e7f1;
+  --color-brand-200: #c3cfe3;
+  --color-brand-600: #2d4a7a;
+  --color-brand-700: #213a63;
+  --color-brand-800: #1a2e50;
+  --color-brand-900: #12213b;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-white font-sans text-slate-800 antialiased;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+  /* 키보드 이동 시 초점 표시 */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand-600;
+  }
+}
